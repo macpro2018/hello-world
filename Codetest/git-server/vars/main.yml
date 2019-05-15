@@ -1,0 +1,10 @@
+---
+# This space intentionally left blank.
+packages:
+        - build-essential 
+        - dh-autoreconf 
+        - libcurl4-gnutls-dev 
+        - libexpat1-dev 
+        - gettext 
+        - libz-dev 
+        - libssl-dev

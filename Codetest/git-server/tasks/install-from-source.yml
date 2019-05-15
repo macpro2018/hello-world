@@ -1,0 +1,48 @@
+---
+- name: Include OS-specific variables (RedHat).
+  include_vars: "{{ ansible_os_family }}.yml"
+  when:
+    - ansible_os_family == "RedHat"
+    - ansible_distribution != "Fedora"
+
+- name: Include OS-specific variables (Fedora).
+  include_vars: "{{ ansible_distribution }}.yml"
+  when: ansible_distribution == "Fedora"
+
+- name: Include OS-specific variables (Suse).
+  include_vars: "{{ ansible_os_family }}.yml"
+  when: ansible_os_family == "Suse"
+- name: Install the dependencies
+  apt:
+      name: "{{ item }}"
+      state: latest
+  with_items:
+        " {{ packages }}"
+
+- name: Download git.
+  get_url:
+    url: "https://www.kernel.org/pub/software/scm/git/git-{{ git_version }}.tar.gz"
+    dest: "{{ workspace }}/git-{{ git_version }}.tar.gz"
+
+- name: Expand git archive.
+  unarchive:
+    src: "{{ workspace }}/git-{{ git_version }}.tar.gz"
+    dest: "{{ git_install_path }}"
+    remote_src: yes
+
+- name: Copy the Git Script
+  copy:
+      src: files/gitinstall.sh
+      dest: /tmp/gitinstall.sh
+      mode: 0777
+
+- name: Build git.
+  command: "sh /tmp/gitinstall.sh"
+  remote_src: yes
+
+- name: Get installed version.
+  command: "git --version"
+  register: version
+
+- debug:
+       var: version
